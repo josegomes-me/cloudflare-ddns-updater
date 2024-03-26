@@ -61,14 +61,12 @@ for record_name in "${record_names[@]}"; do
   ## Get existing IP and compare
   ###########################################
   old_ip=$(echo "$record" | sed -E 's/.*"content":"(([0-9]{1,3}\.){3}[0-9]{1,3})".*/\1/')
-  
-  if [[ $ip == $old_ip ]]; then
-    logger "DDNS Updater: IP ($ip) for ${record_name} has not changed."
-    continue  # Skip to the next record_name
-  else
+
+  if [[ $ip != $old_ip ]]; then
+
     logger "DDNS Updater: IP ($ip) for ${record_name} changed. Send e-mail."
 
-     # E-mail data
+    # E-mail data
     SUBJECT="DDNS Update Notification for $record_name"
     BODY="The DDNS record for $record_name has been successfully updated to $ip."
     TO="hi@josegomes.me"
@@ -82,6 +80,12 @@ for record_name in "${record_names[@]}"; do
     echo
     echo "$BODY"
     ) | sendmail -t
+
+  else
+
+    logger "DDNS Updater: IP ($ip) for ${record_name} has not changed."
+    continue  # Skip to the next record_name
+
   fi
 
   ###########################################
